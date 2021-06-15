@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char *TiposProductos[] = {"Galletas","Snack","Cigarrillos","Caramelos","Bebidas"};
+
+typedef struct Producto
+{
+    int ProductoID;       //Numerado en ciclo iterativo
+    int Cantidad;         // entre 1 y 10
+    char *TipoProducto;   // Algún valor del arreglo TiposProductos
+    float PrecioUnitario; // entre 10 - 100
+}Producto;
+
+typedef struct Cliente
+{
+    int ClienteID;               // Numerado en el ciclo iterativo
+    char *NombreCliente;         // Ingresado por usuario
+    int CantidadProductosAPedir; // (alteatorio entre 1 y 5)
+    Producto *Productos;          //El tamaño de este arreglo depende de la variable
+    // “CantidadProductosAPedir”
+}Cliente;
+
+void cargarCliente(Cliente *cliente, int id);
+void cargarProducto(Producto *producto, int cantProduct);
+float costoTotal(Producto *producto);
+void mostrarClientes(Cliente *cliente, int indice);
+float mostrarProductos(Producto *producto, int cantProduct);
+
+int main(){
+    
+    int cantClientes;
+    Cliente *clientes;
+    int i = 0
+
+    printf("Indique la cantidad de clientes [MAX 5]: ");
+    scanf("%d", &cantClientes);
+    clientes = (Cliente *)malloc(sizeof(Cliente) * cantClientes);
+
+    do
+    {
+        cargarCliente(clientes, i);
+        i++;
+    } while (i < cantClientes);
+
+    for (int i = 0; i < cantClientes; i++)
+    {
+         mostrarClientes(clientes, i);
+    }
+
+    return 0;
+}
+
+void cargarCliente(Cliente *cliente, int id){
+    (cliente + id)->ClienteID = id + 1;
+    printf("--------------CARGANDO DATOS DEL CLIENTE[%d]\n");
+    printf("Ingrese el nombre del cliente %d:", id + 1);
+    (cliente + id)->NombreCliente = (char *)malloc(sizeof(char)*100);
+    fflush(stdin);
+
+    gets((cliente + id)->NombreCliente);
+
+    (cliente + id)->CantidadProductosAPedir = rand() % 4 + 1;
+    (cliente + id)->Productos = (Producto *)malloc(sizeof(Producto) * (cliente + id)->CantidadProductosAPedir);
+    
+    cargarProducto((cliente + id)->Productos, (cliente + id)->CantidadProductosAPedir);
+    printf("\n");
+
+}
+
+void cargarProducto(Producto *producto, int cantProduct){
+    for (int i = 0; i < cantProduct; i++)
+    {
+        (producto + i)->ProductoID = i + 1;
+        (producto + i)->Cantidad = rand() % 10 + 1;
+        (producto + i)->TipoProducto = TiposProductos[rand() % 3 + 1];
+        (producto + i)->PrecioUnitario = rand() % 91 + 10;
+    }
+    
+}
+
+float costoTotal(Producto *producto){
+
+    return (producto->Cantidad * producto->PrecioUnitario);
+
+}
+
+void mostrarClientes(Cliente *cliente, int indice){
+    float total;
+    printf("\n-----MOSTRANDO [%d] CLIENTE\n", indice + 1);
+    printf("ID Cliente = %d \n", indice + 1);
+    printf("Nombre del cliente = %s\n", (cliente + indice)->NombreCliente);
+    printf("Cantidad de productos que lleva = %d\n", (cliente + indice)->CantidadProductosAPedir);
+    total = mostrarProductos((cliente + indice)->Productos, (cliente + indice)->CantidadProductosAPedir);
+    printf("\nEl total NETO A PAGAR ES = %f\n", total);
+}
+
+float mostrarProductos(Producto *producto, int cantProduct){
+    float total = 0;
+    printf("\n-----MOSTRAR PRODUCTOS\n");
+    for (int i = 0; i < cantProduct; i++)
+    {
+        printf("\nPRODUCTO [%d]\n", i + 1);
+        printf("ID del producto = %d \n", (producto + i)->ProductoID);
+        printf("Tipo de producto = %s \n",(producto + i)->TipoProducto);
+        printf("Cantidad de productos = %d \n",(producto + i)->Cantidad);
+        printf("Precio unitario del producto = %f \n",(producto + i)->PrecioUnitario);
+        printf("Precio total de productos = %f \n", costoTotal(producto + i));
+        total += costoTotal(producto + i);
+    }
+    return total;
+}
